@@ -20,5 +20,11 @@ class NewestFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_newest, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+
+        val apiCalls = ApiCalls()
+        apiCalls.getNewest()
+    }
 }
