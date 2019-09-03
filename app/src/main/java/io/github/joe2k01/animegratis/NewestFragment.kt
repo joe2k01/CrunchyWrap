@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_newest.*
 import org.json.JSONObject
 
@@ -28,20 +28,24 @@ class NewestFragment : Fragment() {
         val apiCalls = ApiCalls()
         val newest = apiCalls.getNewest()
 
-        val titles = arrayOfNulls<String>(10)
-        val image = arrayOfNulls<String>(10)
-        val seriesId = arrayOfNulls<String>(10)
+        val titles = Array(10) { "" }
+        val images = Array(10) { "" }
+        val seriesIds = Array(10) { "" }
         for (x in newest.indices) {
             val json = JSONObject(newest[x]!!)
             titles[x] = json.getString("name")
-            seriesId[x] = json.getString("series_id")
+            seriesIds[x] = json.getString("series_id")
             val portrait = JSONObject(json.getString("portrait_image"))
-            image[x] = portrait.getString("medium_url")
+            images[x] = portrait.getString("full_url")
         }
 
-        val arrayAdapter =
-            ArrayAdapter(activity!!.baseContext, android.R.layout.simple_list_item_1, titles)
-        listView.adapter = arrayAdapter
-    }
+        val linearLayoutManager = LinearLayoutManager(view.context)
+        val animeAdapter = AnimeAdapter(titles, images, seriesIds)
 
+        recyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = linearLayoutManager
+            adapter = animeAdapter
+        }
+    }
 }
