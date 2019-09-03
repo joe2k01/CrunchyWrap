@@ -1,5 +1,6 @@
 package io.github.joe2k01.animegratis
 
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -61,7 +62,8 @@ class ApiCalls {
         return auth
     }
 
-    fun getNewest() {
+    fun getNewest(): Array<String?> {
+        var seriesArray = arrayOfNulls<String>(10)
         val auth = authenticate()
         reqParam += "&" + URLEncoder.encode("auth", "UTF-8") + "=" + URLEncoder.encode(
             auth,
@@ -96,10 +98,17 @@ class ApiCalls {
                         inputLine = it.readLine()
                     }
                     it.close()
-                    println(response)
+                    val dataObject = JSONObject(response.toString()).get("data").toString()
+                    val array = JSONArray(dataObject)
+                    for (x in 0 until array.length()) {
+                        seriesArray[x] = array.get(x).toString()
+                    }
                 }
             }
         }
         t.start()
+        t.join()
+
+        return seriesArray
     }
 }

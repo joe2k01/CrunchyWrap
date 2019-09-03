@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
  * A simple [Fragment] subclass.
  */
 class NewestFragment : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -23,8 +22,8 @@ class NewestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val apiCalls = ApiCalls()
-        apiCalls.getNewest()
+        val newest = apiCalls.getNewest()
     }
+
 }
