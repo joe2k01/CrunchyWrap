@@ -2,6 +2,7 @@ package io.github.joe2k01.animegratis
 
 import android.content.Context
 import android.content.Intent
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,9 @@ class AnimeAdapter(
 
     class AnimeViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
+    private val metrics: DisplayMetrics = context!!.resources.displayMetrics
+    private val width: Int = metrics.widthPixels / 3
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimeViewHolder {
         val layout =
             LayoutInflater.from(parent.context).inflate(R.layout.anime_list_item, parent, false)
@@ -35,6 +39,9 @@ class AnimeAdapter(
         val item = holder.view.findViewById<LinearLayout>(R.id.item)
 
         title.text = titles[position]
+
+        image.layoutParams.width = width
+        image.layoutParams.height = 300 * width / 200
 
         Picasso.get()
             .load(portraitImages[position])
