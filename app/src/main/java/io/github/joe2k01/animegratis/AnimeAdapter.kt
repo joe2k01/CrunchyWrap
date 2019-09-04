@@ -2,6 +2,7 @@ package io.github.joe2k01.animegratis
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 class AnimeAdapter(
-    private val context: Context?,
+    private val context: Context,
     private val titles: Array<String>,
     private val portraitImages: Array<String>,
     private val landscapeImages: Array<String>,
@@ -23,8 +24,7 @@ class AnimeAdapter(
 
     class AnimeViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
-    private val metrics: DisplayMetrics = context!!.resources.displayMetrics
-    private val width: Int = metrics.widthPixels / 3
+    private val metrics: DisplayMetrics = context.resources.displayMetrics
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimeViewHolder {
         val layout =
@@ -38,10 +38,17 @@ class AnimeAdapter(
         val image = holder.view.findViewById<ImageView>(R.id.image)
         val item = holder.view.findViewById<LinearLayout>(R.id.item)
 
-        title.text = titles[position]
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val width = metrics.widthPixels / 6
+            image.layoutParams.width = width
+            image.layoutParams.height = 300 * width / 200
+        } else {
+            val width = metrics.widthPixels / 3
+            image.layoutParams.width = width
+            image.layoutParams.height = 300 * width / 200
+        }
 
-        image.layoutParams.width = width
-        image.layoutParams.height = 300 * width / 200
+        title.text = titles[position]
 
         Picasso.get()
             .load(portraitImages[position])
@@ -54,7 +61,7 @@ class AnimeAdapter(
             anime.putExtra("title", titles[position])
             anime.putExtra("description", descriptions[position])
             anime.putExtra("image", landscapeImages[position])
-            context?.startActivity(anime)
+            context.startActivity(anime)
         }
     }
 

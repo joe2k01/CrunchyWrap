@@ -2,6 +2,7 @@ package io.github.joe2k01.animegratis
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +24,6 @@ class EpisodesAdapter(
     class EpisodesViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     private val metrics: DisplayMetrics = context.resources.displayMetrics
-    private val width: Int = metrics.widthPixels / 3
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodesViewHolder {
         val layout =
@@ -37,14 +37,21 @@ class EpisodesAdapter(
         val image = holder.view.findViewById<ImageView>(R.id.image)
         val item = holder.view.findViewById<LinearLayout>(R.id.item)
 
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val width = metrics.widthPixels / 6
+            image.layoutParams.width = width
+            image.layoutParams.height = 360 * width / 640
+        } else {
+            val width = metrics.widthPixels / 3
+            image.layoutParams.width = width
+            image.layoutParams.height = 360 * width / 640
+        }
+
         title.text = String.format(
             context.getString(R.string.episodes_placeholder),
             numbers[position],
             titles[position]
         )
-
-        image.layoutParams.width = width
-        image.layoutParams.height = 360 * width / 640
 
         Picasso.get()
             .load(images[position])

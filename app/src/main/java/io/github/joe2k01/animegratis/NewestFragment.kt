@@ -46,7 +46,7 @@ class NewestFragment : Fragment() {
 
         val linearLayoutManager = LinearLayoutManager(view.context)
         val animeAdapter = AnimeAdapter(
-            context, titles, portraitImages, landscapeImages,
+            view.context, titles, portraitImages, landscapeImages,
             descriptions, seriesIds
         )
 
