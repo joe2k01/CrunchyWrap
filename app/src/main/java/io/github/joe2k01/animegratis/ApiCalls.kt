@@ -14,7 +14,7 @@ class ApiCalls {
 
     fun authenticate(): String {
 
-        var auth = ""
+        var sessionId = ""
         val t = Thread {
             reqParam = URLEncoder.encode(
                 "device_id",
@@ -51,7 +51,7 @@ class ApiCalls {
                     }
                     it.close()
                     val dataObject = JSONObject(response.toString()).get("data")
-                    auth = JSONObject(dataObject.toString()).get("session_id").toString()
+                    sessionId = JSONObject(dataObject.toString()).get("session_id").toString()
                 }
             }
         }
@@ -59,14 +59,14 @@ class ApiCalls {
         t.start()
         t.join()
 
-        return auth
+        return sessionId
     }
 
     fun getNewest(): Array<String?> {
         var seriesArray = arrayOfNulls<String>(10)
-        val auth = authenticate()
-        reqParam += "&" + URLEncoder.encode("auth", "UTF-8") + "=" + URLEncoder.encode(
-            auth,
+        val sessionId = authenticate()
+        reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
+            sessionId,
             "UTF-8"
         )
         reqParam += "&" + URLEncoder.encode("media_type", "UTF-8") + "=" + URLEncoder.encode(
@@ -110,5 +110,55 @@ class ApiCalls {
         t.join()
 
         return seriesArray
+    }
+
+    fun getEpisodes(seriesId: String): ArrayList<String> {
+        var episodes = ArrayList<String>()
+        val sessionId = authenticate()
+
+        reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
+            sessionId,
+            "UTF-8"
+        )
+        reqParam += "&" + URLEncoder.encode("series_id", "UTF-8") + "=" + URLEncoder.encode(
+            seriesId,
+            "UTF-8"
+        )
+        reqParam += "&" + URLEncoder.encode("limit", "UTF-8") + "=" + URLEncoder.encode(
+            Int.MAX_VALUE.toString(),
+            "UTF-8"
+        )
+
+        val t = Thread {
+            val mURL = URL("https://api.crunchyroll.com/list_media.0.json")
+
+            with(mURL.openConnection() as HttpURLConnection) {
+                requestMethod = "POST"
+
+                val wr = OutputStreamWriter(outputStream)
+                wr.write(reqParam)
+                wr.flush()
+
+                BufferedReader(InputStreamReader(inputStream)).use {
+                    val response = StringBuffer()
+
+                    var inputLine = it.readLine()
+                    while (inputLine != null) {
+                        response.append(inputLine)
+                        inputLine = it.readLine()
+                    }
+                    it.close()
+                    val dataObject = JSONObject(response.toString()).get("data").toString()
+                    val array = JSONArray(dataObject)
+                    for (x in 0 until array.length()) {
+                        episodes.add(array.get(x).toString())
+                    }
+                }
+            }
+        }
+        t.start()
+        t.join()
+
+        return episodes
     }
 }

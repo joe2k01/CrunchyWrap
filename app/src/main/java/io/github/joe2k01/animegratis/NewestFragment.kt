@@ -29,18 +29,26 @@ class NewestFragment : Fragment() {
         val newest = apiCalls.getNewest()
 
         val titles = Array(10) { "" }
-        val images = Array(10) { "" }
+        val portraitImages = Array(10) { "" }
+        val landscapeImages = Array(10) { "" }
+        val descriptions = Array(10) { "" }
         val seriesIds = Array(10) { "" }
         for (x in newest.indices) {
             val json = JSONObject(newest[x]!!)
             titles[x] = json.getString("name")
             seriesIds[x] = json.getString("series_id")
+            descriptions[x] = json.getString("description")
             val portrait = JSONObject(json.getString("portrait_image"))
-            images[x] = portrait.getString("full_url")
+            val landscape = JSONObject(json.getString("landscape_image"))
+            portraitImages[x] = portrait.getString("full_url")
+            landscapeImages[x] = landscape.getString("full_url")
         }
 
         val linearLayoutManager = LinearLayoutManager(view.context)
-        val animeAdapter = AnimeAdapter(titles, images, seriesIds)
+        val animeAdapter = AnimeAdapter(
+            context, titles, portraitImages, landscapeImages,
+            descriptions, seriesIds
+        )
 
         recyclerView.apply {
             setHasFixedSize(true)

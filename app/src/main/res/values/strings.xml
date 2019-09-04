@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Anime Gratis</string>
     <string name="search_hint">Cerca un anime</string>
+    <string name="description_title">Descrizione</string>
+    <string name="episodes_title">Episodi</string>
+    <string name="episodes_placeholder">%s %s</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
