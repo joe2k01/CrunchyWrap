@@ -161,4 +161,54 @@ class ApiCalls {
 
         return episodes
     }
+
+    fun getStreamingLink(mediaId: String): String {
+        var url = ""
+        var sessionId = authenticate()
+        reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
+            sessionId,
+            "UTF-8"
+        )
+        reqParam += "&" + URLEncoder.encode("media_id", "UTF-8") + "=" + URLEncoder.encode(
+            mediaId,
+            "UTF-8"
+        )
+        reqParam += "&" + URLEncoder.encode("fields", "UTF-8") + "=" + URLEncoder.encode(
+            "media.stream_data",
+            "UTF-8"
+        )
+
+        val t = Thread {
+            val mURL = URL("https://api.crunchyroll.com/info.0.json")
+
+            with(mURL.openConnection() as HttpURLConnection) {
+                requestMethod = "POST"
+
+                val wr = OutputStreamWriter(outputStream)
+                wr.write(reqParam)
+                wr.flush()
+
+                BufferedReader(InputStreamReader(inputStream)).use {
+                    val response = StringBuffer()
+
+                    var inputLine = it.readLine()
+                    while (inputLine != null) {
+                        response.append(inputLine)
+                        inputLine = it.readLine()
+                    }
+                    it.close()
+                    val dataObject = JSONObject(response.toString()).get("data").toString()
+                    val streamData = JSONObject(dataObject).get("stream_data").toString()
+                    val streams = JSONObject(streamData).get("streams").toString()
+                    val array = JSONArray(streams)
+                    val adaptiveObject = JSONObject(array.get(0).toString())
+                    url = adaptiveObject.getString("url")
+                }
+            }
+        }
+        t.start()
+        t.join()
+
+        return url
+    }
 }

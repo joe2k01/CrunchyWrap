@@ -3,6 +3,7 @@
     package="io.github.joe2k01.animegratis">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -11,6 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".StreamingActivity"
+            android:theme="@style/StreamingTheme" />
         <activity
             android:name=".AnimeActivity"
             android:parentActivityName=".MainActivity"

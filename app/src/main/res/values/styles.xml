@@ -15,8 +15,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat">
-        <item name="android:textColorPrimary">#000</item>
+    <style name="StreamingTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
 </resources>

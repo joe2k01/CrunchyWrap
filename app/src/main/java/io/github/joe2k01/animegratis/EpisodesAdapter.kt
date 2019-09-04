@@ -1,6 +1,7 @@
 package io.github.joe2k01.animegratis
 
 import android.content.Context
+import android.content.Intent
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 class EpisodesAdapter(
-    private val context: Context?,
+    private val context: Context,
     private val titles: Array<String>,
     private val numbers: Array<String>,
     private val images: Array<String>,
@@ -21,7 +22,7 @@ class EpisodesAdapter(
 
     class EpisodesViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
-    private val metrics: DisplayMetrics = context!!.resources.displayMetrics
+    private val metrics: DisplayMetrics = context.resources.displayMetrics
     private val width: Int = metrics.widthPixels / 3
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodesViewHolder {
@@ -37,7 +38,7 @@ class EpisodesAdapter(
         val item = holder.view.findViewById<LinearLayout>(R.id.item)
 
         title.text = String.format(
-            context!!.getString(R.string.episodes_placeholder),
+            context.getString(R.string.episodes_placeholder),
             numbers[position],
             titles[position]
         )
@@ -49,6 +50,12 @@ class EpisodesAdapter(
             .load(images[position])
             .fit()
             .into(image)
+
+        item.setOnClickListener {
+            val episode = Intent(holder.view.context, StreamingActivity::class.java)
+            episode.putExtra("id", mediaIds[position])
+            holder.view.context.startActivity(episode)
+        }
     }
 
     override fun getItemCount() = (titles.size - 1)
