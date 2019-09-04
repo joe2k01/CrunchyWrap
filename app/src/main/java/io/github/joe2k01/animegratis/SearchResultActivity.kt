@@ -1,41 +1,28 @@
 package io.github.joe2k01.animegratis
 
-
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_newest.*
 import org.json.JSONObject
 
-/**
- * A simple [Fragment] subclass.
- */
-class NewestFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_newest, container, false)
-    }
+class SearchResultActivity : AppCompatActivity() {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_search_result)
 
         val apiCalls = ApiCalls()
-        val newest = apiCalls.getNewest()
+        val results = apiCalls.search(intent.getStringExtra("query")!!)
 
-        val size = newest.size
+        val size = results.size
         val titles = Array(size) { "" }
         val portraitImages = Array(size) { "" }
         val landscapeImages = Array(size) { "" }
         val descriptions = Array(size) { "" }
         val seriesIds = Array(size) { "" }
-        for (x in newest.indices) {
-            val json = JSONObject(newest[x]!!)
+        for (x in results.indices) {
+            val json = JSONObject(results[x])
             titles[x] = json.getString("name")
             seriesIds[x] = json.getString("series_id")
             descriptions[x] = json.getString("description")
@@ -45,9 +32,9 @@ class NewestFragment : Fragment() {
             landscapeImages[x] = landscape.getString("full_url")
         }
 
-        val linearLayoutManager = LinearLayoutManager(view.context)
+        val linearLayoutManager = LinearLayoutManager(baseContext)
         val animeAdapter = AnimeAdapter(
-            view.context, titles, portraitImages, landscapeImages,
+            baseContext, titles, portraitImages, landscapeImages,
             descriptions, seriesIds
         )
 

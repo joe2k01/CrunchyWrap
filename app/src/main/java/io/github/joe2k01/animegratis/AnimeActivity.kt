@@ -46,7 +46,7 @@ class AnimeActivity : AppCompatActivity() {
         val numbers = Array(size) { "" }
         val mediaIds = Array(size) { "" }
         val screenShots = Array(size) { "" }
-        for (x in 0 until (size - 1)) {
+        for (x in episodes.indices) {
             val json = JSONObject(episodes[x])
             titles[x] = json.getString("name")
             numbers[x] = json.getString("episode_number")

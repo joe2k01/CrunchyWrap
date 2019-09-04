@@ -112,6 +112,56 @@ class ApiCalls {
         return seriesArray
     }
 
+    fun search(query: String): ArrayList<String> {
+        var seriesArray = ArrayList<String>()
+        val sessionId = authenticate()
+        reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
+            sessionId,
+            "UTF-8"
+        )
+        reqParam += "&" + URLEncoder.encode("media_types", "UTF-8") + "=" + URLEncoder.encode(
+            "anime",
+            "UTF-8"
+        )
+
+        reqParam += "&" + URLEncoder.encode("q", "UTF-8") + "=" + URLEncoder.encode(
+            query,
+            "UTF-8"
+        )
+
+        val t = Thread {
+            val mURL = URL("https://api.crunchyroll.com/autocomplete.0.json")
+
+            with(mURL.openConnection() as HttpURLConnection) {
+                requestMethod = "POST"
+
+                val wr = OutputStreamWriter(outputStream)
+                wr.write(reqParam)
+                wr.flush()
+
+                BufferedReader(InputStreamReader(inputStream)).use {
+                    val response = StringBuffer()
+
+                    var inputLine = it.readLine()
+                    while (inputLine != null) {
+                        response.append(inputLine)
+                        inputLine = it.readLine()
+                    }
+                    it.close()
+                    val dataObject = JSONObject(response.toString()).get("data").toString()
+                    val array = JSONArray(dataObject)
+                    for (x in 0 until array.length()) {
+                        seriesArray.add(array.get(x).toString())
+                    }
+                }
+            }
+        }
+        t.start()
+        t.join()
+
+        return seriesArray
+    }
+
     fun getEpisodes(seriesId: String): ArrayList<String> {
         var episodes = ArrayList<String>()
         val sessionId = authenticate()

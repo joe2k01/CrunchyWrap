@@ -2,6 +2,7 @@ package io.github.joe2k01.animegratis
 
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -36,5 +37,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        if (Intent.ACTION_SEARCH == intent?.action) {
+            val query = intent.getStringExtra(SearchManager.QUERY)
+            invalidateOptionsMenu()
+
+            val intent = Intent(this, SearchResultActivity::class.java)
+            intent.putExtra("query", query)
+            startActivity(intent)
+        }
     }
 }

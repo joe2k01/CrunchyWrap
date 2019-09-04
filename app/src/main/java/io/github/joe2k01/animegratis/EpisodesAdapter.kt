@@ -65,5 +65,5 @@ class EpisodesAdapter(
         }
     }
 
-    override fun getItemCount() = (titles.size - 1)
+    override fun getItemCount() = titles.size
 }

@@ -13,12 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".SearchResultActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ActionBarTheme" />
+        <activity
             android:name=".StreamingActivity"
             android:theme="@style/StreamingTheme" />
         <activity
             android:name=".AnimeActivity"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AnimeTheme" />
+            android:theme="@style/ActionBarTheme" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop">

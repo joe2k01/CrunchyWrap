@@ -56,12 +56,12 @@ class AnimeAdapter(
             .into(image)
 
         item.setOnClickListener {
-            val anime = Intent(context, AnimeActivity::class.java)
+            val anime = Intent(holder.view.context, AnimeActivity::class.java)
             anime.putExtra("id", serieIds[position])
             anime.putExtra("title", titles[position])
             anime.putExtra("description", descriptions[position])
             anime.putExtra("image", landscapeImages[position])
-            context.startActivity(anime)
+            holder.view.context.startActivity(anime)
         }
     }
 
