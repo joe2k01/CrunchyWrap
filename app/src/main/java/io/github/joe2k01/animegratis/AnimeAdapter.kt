@@ -61,6 +61,8 @@ class AnimeAdapter(
 
         if (alreadyLiked)
             like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up))
+        else
+            like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up_outline))
 
         Picasso.get()
             .load(portraitImages[position])

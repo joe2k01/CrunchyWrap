@@ -1,17 +1,20 @@
 package io.github.joe2k01.animegratis
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.fragment_newest.*
+import org.json.JSONObject
 
 /**
  * A simple [Fragment] subclass.
  */
 class FollowingFragment : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -20,5 +23,52 @@ class FollowingFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_following, container, false)
     }
 
+    private fun populateLiked(context: Context) {
+        val sharedPref = context.getSharedPreferences(
+            context.resources.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+        )
 
+        val ids = sharedPref.getString("ids", "nope")
+
+        if (!ids.equals("nope") && ids!!.length > 1) {
+            val mIds = ids.split(",").toTypedArray()
+
+            val apiCalls = ApiCalls()
+            val liked = apiCalls.getLiked(mIds)
+
+            val size = liked.size
+            val titles = Array(size) { "" }
+            val portraitImages = Array(size) { "" }
+            val landscapeImages = Array(size) { "" }
+            val descriptions = Array(size) { "" }
+            val seriesIds = Array(size) { "" }
+            for (x in liked.indices) {
+                val json = JSONObject(liked[x])
+                titles[x] = json.getString("name")
+                seriesIds[x] = json.getString("series_id")
+                descriptions[x] = json.getString("description")
+                val portrait = JSONObject(json.getString("portrait_image"))
+                val landscape = JSONObject(json.getString("landscape_image"))
+                portraitImages[x] = portrait.getString("full_url")
+                landscapeImages[x] = landscape.getString("full_url")
+            }
+
+            val linearLayoutManager = LinearLayoutManager(context)
+            val animeAdapter = AnimeAdapter(
+                context, titles, portraitImages, landscapeImages,
+                descriptions, seriesIds
+            )
+
+            recyclerView.apply {
+                setHasFixedSize(true)
+                layoutManager = linearLayoutManager
+                adapter = animeAdapter
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        populateLiked(view.context)
+    }
 }

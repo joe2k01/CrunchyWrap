@@ -112,6 +112,58 @@ class ApiCalls {
         return seriesArray
     }
 
+    fun getLiked(ids: Array<String>): ArrayList<String> {
+        var seriesArray = ArrayList<String>()
+        val sessionId = authenticate()
+        val originalParam = reqParam
+
+        val t = Thread {
+            val mURL = URL("https://api.crunchyroll.com/info.0.json")
+
+            for (x in 0..(ids.size - 2)) {
+                reqParam = originalParam
+                reqParam += "&" + URLEncoder.encode(
+                    "session_id",
+                    "UTF-8"
+                ) + "=" + URLEncoder.encode(
+                    sessionId,
+                    "UTF-8"
+                )
+                reqParam += "&" + URLEncoder.encode(
+                    "series_id",
+                    "UTF-8"
+                ) + "=" + URLEncoder.encode(
+                    ids[x],
+                    "UTF-8"
+                )
+
+                with(mURL.openConnection() as HttpURLConnection) {
+                    requestMethod = "POST"
+
+                    val wr = OutputStreamWriter(outputStream)
+                    wr.write(reqParam)
+                    wr.flush()
+
+                    BufferedReader(InputStreamReader(inputStream)).use {
+                        val response = StringBuffer()
+
+                        var inputLine = it.readLine()
+                        while (inputLine != null) {
+                            response.append(inputLine)
+                            inputLine = it.readLine()
+                        }
+                        it.close()
+                        seriesArray.add(JSONObject(response.toString()).get("data").toString())
+                    }
+                }
+            }
+        }
+        t.start()
+        t.join()
+
+        return seriesArray
+    }
+
     fun search(query: String): ArrayList<String> {
         var seriesArray = ArrayList<String>()
         val sessionId = authenticate()
