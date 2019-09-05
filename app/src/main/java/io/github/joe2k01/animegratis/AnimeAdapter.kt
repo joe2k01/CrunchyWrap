@@ -25,6 +25,10 @@ class AnimeAdapter(
     class AnimeViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     private val metrics: DisplayMetrics = context.resources.displayMetrics
+    private val sharedPref = context.getSharedPreferences(
+        context.resources.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+    )
+    private var liked = sharedPref.getString("ids", "none")
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimeViewHolder {
         val layout =
@@ -36,9 +40,14 @@ class AnimeAdapter(
     override fun onBindViewHolder(holder: AnimeViewHolder, position: Int) {
         val title = holder.view.findViewById<TextView>(R.id.title)
         val image = holder.view.findViewById<ImageView>(R.id.image)
+        val like = holder.view.findViewById<ImageView>(R.id.like)
         val item = holder.view.findViewById<LinearLayout>(R.id.item)
 
-        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        var alreadyLiked = liked!!.contains(serieIds[position])
+
+        val hContext = holder.view.context
+
+        if (hContext.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             val width = metrics.widthPixels / 6
             image.layoutParams.width = width
             image.layoutParams.height = 300 * width / 200
@@ -50,18 +59,55 @@ class AnimeAdapter(
 
         title.text = titles[position]
 
+        if (alreadyLiked)
+            like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up))
+
         Picasso.get()
             .load(portraitImages[position])
             .fit()
             .into(image)
 
+        like.setOnClickListener {
+            alreadyLiked = liked!!.contains(serieIds[position])
+            if (!alreadyLiked) {
+                like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up))
+
+                val animeId = serieIds[position]
+
+                if (liked.equals("none")) {
+                    with(sharedPref.edit()) {
+                        putString("ids", "$animeId,")
+                        apply()
+                    }
+                } else {
+                    with(sharedPref.edit()) {
+                        putString("ids", "$animeId,$liked")
+                        apply()
+                    }
+                }
+
+                liked = sharedPref.getString("ids", "none")
+            } else {
+                like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up_outline))
+
+                val animeId = serieIds[position]
+
+                with(sharedPref.edit()) {
+                    putString("ids", liked!!.replace("$animeId,", ""))
+                    apply()
+                }
+
+                liked = sharedPref.getString("ids", "none")
+            }
+        }
+
         item.setOnClickListener {
-            val anime = Intent(holder.view.context, AnimeActivity::class.java)
+            val anime = Intent(hContext, AnimeActivity::class.java)
             anime.putExtra("id", serieIds[position])
             anime.putExtra("title", titles[position])
             anime.putExtra("description", descriptions[position])
             anime.putExtra("image", landscapeImages[position])
-            holder.view.context.startActivity(anime)
+            hContext.startActivity(anime)
         }
     }
 
