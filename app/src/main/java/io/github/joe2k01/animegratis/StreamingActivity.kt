@@ -1,44 +1,56 @@
 package io.github.joe2k01.animegratis
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.MediaController
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.android.synthetic.main.activity_streaming.*
 
 class StreamingActivity : AppCompatActivity() {
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(p0: Context?, intent: Intent?) {
+            if (intent != null) {
+                val url = intent.getStringExtra("url")!!
+                videoView.setVideoURI(Uri.parse(url))
+                videoView.start()
 
-    private lateinit var mediaController: MediaController
+                videoView.setOnPreparedListener {
+                    progress.max = videoView.duration
+                }
+
+                videoView.setOnClickListener {
+                    if (controls.isVisible)
+                        controls.visibility = View.GONE
+                    else {
+                        progress.progress = videoView.currentPosition
+                        controls.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_streaming)
+
+        LocalBroadcastManager.getInstance(baseContext)
+            .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).URL_INTENT))
 
         window.decorView.apply {
             systemUiVisibility =
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         }
 
-        val url = ApiCalls().getStreamingLink(intent.getStringExtra("id")!!)
-        videoView.setVideoURI(Uri.parse(url))
-        videoView.start()
-
-        videoView.setOnPreparedListener {
-            progress.max = videoView.duration
-        }
-
-        videoView.setOnClickListener {
-            if (controls.isVisible)
-                controls.visibility = View.GONE
-            else {
-                progress.progress = videoView.currentPosition
-                controls.visibility = View.VISIBLE
-            }
-        }
+        ApiCalls(baseContext).getStreamingLink(intent.getStringExtra("id")!!)
 
         progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) {}
@@ -65,5 +77,11 @@ class StreamingActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    }
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(baseContext).unregisterReceiver(receiver)
+
+        super.onDestroy()
     }
 }

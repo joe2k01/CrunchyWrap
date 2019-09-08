@@ -1,5 +1,8 @@
 package io.github.joe2k01.animegratis
 
+import android.content.Context
+import android.content.Intent
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -9,8 +12,14 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-class ApiCalls {
+class ApiCalls(val context: Context) {
     lateinit var reqParam: String
+
+    val LIKED_INTENT = "io.github.joe2k01.following"
+    val NEWEST_INTENT = "io.github.joe2k01.newest"
+    val EPISODES_INTENT = "io.github.joe2k01.episodes"
+    val SEARCH_INTENT = "io.github.joe2k01.search"
+    val URL_INTENT = "io.github.joe2k01.url"
 
     fun authenticate(): String {
 
@@ -62,7 +71,7 @@ class ApiCalls {
         return sessionId
     }
 
-    fun getNewest(): Array<String?> {
+    fun getNewest() {
         var seriesArray = arrayOfNulls<String>(10)
         val sessionId = authenticate()
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
@@ -105,14 +114,15 @@ class ApiCalls {
                     }
                 }
             }
+
+            val intent = Intent(NEWEST_INTENT)
+            intent.putExtra("newest", seriesArray)
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
         t.start()
-        t.join()
-
-        return seriesArray
     }
 
-    fun getLiked(ids: Array<String>): ArrayList<String> {
+    fun getLiked(ids: Array<String>) {
         var seriesArray = ArrayList<String>()
         val sessionId = authenticate()
         val originalParam = reqParam
@@ -155,16 +165,17 @@ class ApiCalls {
                         it.close()
                         seriesArray.add(JSONObject(response.toString()).get("data").toString())
                     }
+
+                    val intent = Intent(LIKED_INTENT)
+                    intent.putExtra("liked", seriesArray)
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
                 }
             }
         }
         t.start()
-        t.join()
-
-        return seriesArray
     }
 
-    fun search(query: String): ArrayList<String> {
+    fun search(query: String) {
         var seriesArray = ArrayList<String>()
         val sessionId = authenticate()
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
@@ -206,15 +217,16 @@ class ApiCalls {
                         seriesArray.add(array.get(x).toString())
                     }
                 }
+
+                val intent = Intent(SEARCH_INTENT)
+                intent.putExtra("results", seriesArray)
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
             }
         }
         t.start()
-        t.join()
-
-        return seriesArray
     }
 
-    fun getEpisodes(seriesId: String): ArrayList<String> {
+    fun getEpisodes(seriesId: String) {
         var episodes = ArrayList<String>()
         val sessionId = authenticate()
 
@@ -257,14 +269,15 @@ class ApiCalls {
                     }
                 }
             }
+
+            val intent = Intent(EPISODES_INTENT)
+            intent.putExtra("episodes", episodes)
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
         t.start()
-        t.join()
-
-        return episodes
     }
 
-    fun getStreamingLink(mediaId: String): String {
+    fun getStreamingLink(mediaId: String) {
         var url = ""
         var sessionId = authenticate()
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
@@ -307,10 +320,11 @@ class ApiCalls {
                     url = adaptiveObject.getString("url")
                 }
             }
+
+            val intent = Intent(URL_INTENT)
+            intent.putExtra("url", url)
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
         t.start()
-        t.join()
-
-        return url
     }
 }
