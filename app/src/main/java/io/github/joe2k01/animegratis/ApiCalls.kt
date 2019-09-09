@@ -2,6 +2,7 @@ package io.github.joe2k01.animegratis
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.json.JSONArray
 import org.json.JSONObject
@@ -21,26 +22,33 @@ class ApiCalls(val context: Context) {
     val SEARCH_INTENT = "io.github.joe2k01.search"
     val URL_INTENT = "io.github.joe2k01.url"
 
-    fun authenticate(): String {
+    private val sharedPref: SharedPreferences = context.getSharedPreferences(
+        context.resources.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+    )
 
+    fun clearParam() {
+        reqParam = URLEncoder.encode(
+            "device_id",
+            "UTF-8"
+        ) + "=" + URLEncoder.encode("efad739f-d50d-42d6-a504-f1af339393ff", "UTF-8")
+        reqParam += "&" + URLEncoder.encode(
+            "device_type",
+            "UTF-8"
+        ) + "=" + URLEncoder.encode("com.crunchyroll.crunchyroid", "UTF-8")
+        reqParam += "&" + URLEncoder.encode(
+            "access_token",
+            "UTF-8"
+        ) + "=" + URLEncoder.encode("Scwg9PRRZ19iVwD", "UTF-8")
+        reqParam += "&" + URLEncoder.encode("version", "UTF-8") + "=" + URLEncoder.encode(
+            "444",
+            "UTF-8"
+        )
+    }
+
+    fun authenticate() {
+        clearParam()
         var sessionId = ""
         val t = Thread {
-            reqParam = URLEncoder.encode(
-                "device_id",
-                "UTF-8"
-            ) + "=" + URLEncoder.encode("efad739f-d50d-42d6-a504-f1af339393ff", "UTF-8")
-            reqParam += "&" + URLEncoder.encode(
-                "device_type",
-                "UTF-8"
-            ) + "=" + URLEncoder.encode("com.crunchyroll.crunchyroid", "UTF-8")
-            reqParam += "&" + URLEncoder.encode(
-                "access_token",
-                "UTF-8"
-            ) + "=" + URLEncoder.encode("Scwg9PRRZ19iVwD", "UTF-8")
-            reqParam += "&" + URLEncoder.encode("version", "UTF-8") + "=" + URLEncoder.encode(
-                "444",
-                "UTF-8"
-            )
             val mURL = URL("https://api.crunchyroll.com/start_session.0.json")
 
             with(mURL.openConnection() as HttpURLConnection) {
@@ -63,17 +71,21 @@ class ApiCalls(val context: Context) {
                     sessionId = JSONObject(dataObject.toString()).get("session_id").toString()
                 }
             }
+
+            with(sharedPref.edit()) {
+                putString("session_id", sessionId)
+                apply()
+            }
         }
 
         t.start()
         t.join()
-
-        return sessionId
     }
 
     fun getNewest() {
+        clearParam()
         var seriesArray = arrayOfNulls<String>(10)
-        val sessionId = authenticate()
+        val sessionId = sharedPref.getString("session_id", "null")
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
             sessionId,
             "UTF-8"
@@ -123,8 +135,9 @@ class ApiCalls(val context: Context) {
     }
 
     fun getLiked(ids: Array<String>) {
+        clearParam()
         var seriesArray = ArrayList<String>()
-        val sessionId = authenticate()
+        val sessionId = sharedPref.getString("session_id", "null")
         val originalParam = reqParam
 
         val t = Thread {
@@ -176,8 +189,9 @@ class ApiCalls(val context: Context) {
     }
 
     fun search(query: String) {
+        clearParam()
         var seriesArray = ArrayList<String>()
-        val sessionId = authenticate()
+        val sessionId = sharedPref.getString("session_id", "null")
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
             sessionId,
             "UTF-8"
@@ -227,8 +241,9 @@ class ApiCalls(val context: Context) {
     }
 
     fun getEpisodes(seriesId: String) {
+        clearParam()
         var episodes = ArrayList<String>()
-        val sessionId = authenticate()
+        val sessionId = sharedPref.getString("session_id", "null")
 
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
             sessionId,
@@ -278,8 +293,9 @@ class ApiCalls(val context: Context) {
     }
 
     fun getStreamingLink(mediaId: String) {
+        clearParam()
         var url = ""
-        var sessionId = authenticate()
+        var sessionId = sharedPref.getString("session_id", "null")
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
             sessionId,
             "UTF-8"
