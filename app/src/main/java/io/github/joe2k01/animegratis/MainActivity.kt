@@ -49,9 +49,9 @@ class MainActivity : AppCompatActivity() {
             val query = intent.getStringExtra(SearchManager.QUERY)
             invalidateOptionsMenu()
 
-            val intent = Intent(this, SearchResultActivity::class.java)
-            intent.putExtra("query", query)
-            startActivity(intent)
+            val mIntent = Intent(this, SearchResultActivity::class.java)
+            mIntent.putExtra("query", query)
+            startActivity(mIntent)
         }
     }
 }
