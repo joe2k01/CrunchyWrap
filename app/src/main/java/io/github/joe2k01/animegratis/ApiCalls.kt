@@ -22,6 +22,8 @@ class ApiCalls(val context: Context) {
     val SEARCH_INTENT = "io.github.joe2k01.search"
     val URL_INTENT = "io.github.joe2k01.url"
 
+    val UPDATE_LIKED = "io.github.joe2k01.update_liked"
+
     private val sharedPref: SharedPreferences = context.getSharedPreferences(
         context.resources.getString(R.string.preference_file_key), Context.MODE_PRIVATE
     )

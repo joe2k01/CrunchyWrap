@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
@@ -101,6 +102,9 @@ class AnimeAdapter(
 
                 liked = sharedPref.getString("ids", "none")
             }
+
+            val intent = Intent(ApiCalls(context).UPDATE_LIKED)
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
 
         item.setOnClickListener {

@@ -19,9 +19,11 @@ import org.json.JSONObject
  * A simple [Fragment] subclass.
  */
 class NewestFragment : Fragment() {
+    private lateinit var linearLayoutManager: LinearLayoutManager
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
-            if (intent != null) {
+            if (intent != null && intent.action.equals(ApiCalls(context!!).NEWEST_INTENT)) {
                 val newest = intent.getStringArrayExtra("newest")!!
                 val size = newest.size
                 val titles = Array(size) { "" }
@@ -40,7 +42,17 @@ class NewestFragment : Fragment() {
                     landscapeImages[x] = landscape.getString("full_url")
                 }
 
-                val linearLayoutManager = LinearLayoutManager(context)
+                val pos: Int
+                var offset = 0
+                if (!::linearLayoutManager.isInitialized) {
+                    linearLayoutManager = LinearLayoutManager(context)
+                    pos = 11
+                } else {
+                    pos = linearLayoutManager.findFirstVisibleItemPosition()
+                    if (linearLayoutManager.getChildAt(0) != null)
+                        offset = linearLayoutManager.getChildAt(0)!!.top
+                }
+
                 val animeAdapter = AnimeAdapter(
                     context!!, titles, portraitImages, landscapeImages,
                     descriptions, seriesIds
@@ -51,6 +63,12 @@ class NewestFragment : Fragment() {
                     layoutManager = linearLayoutManager
                     adapter = animeAdapter
                 }
+
+                if (pos < 11) {
+                    linearLayoutManager.scrollToPositionWithOffset(pos, offset)
+                }
+            } else if (intent != null) {
+                ApiCalls(context!!).getNewest()
             }
         }
     }
@@ -61,6 +79,9 @@ class NewestFragment : Fragment() {
     ): View? {
         LocalBroadcastManager.getInstance(context!!)
             .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).NEWEST_INTENT))
+
+        LocalBroadcastManager.getInstance(context!!)
+            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).UPDATE_LIKED))
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_newest, container, false)

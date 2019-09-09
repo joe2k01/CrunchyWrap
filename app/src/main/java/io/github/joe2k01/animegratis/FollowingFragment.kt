@@ -21,7 +21,7 @@ import org.json.JSONObject
 class FollowingFragment : Fragment() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
-            if (intent != null) {
+            if (intent != null && intent.action.equals(ApiCalls(context!!).LIKED_INTENT)) {
                 val liked = intent.getStringArrayListExtra("liked")!!
                 val size = liked.size
                 val titles = Array(size) { "" }
@@ -51,6 +51,8 @@ class FollowingFragment : Fragment() {
                     layoutManager = linearLayoutManager
                     adapter = animeAdapter
                 }
+            } else if (intent != null) {
+                populateLiked(context!!)
             }
         }
     }
@@ -61,6 +63,9 @@ class FollowingFragment : Fragment() {
     ): View? {
         LocalBroadcastManager.getInstance(context!!)
             .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).LIKED_INTENT))
+
+        LocalBroadcastManager.getInstance(context!!)
+            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).UPDATE_LIKED))
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_following, container, false)
@@ -78,6 +83,8 @@ class FollowingFragment : Fragment() {
 
             val apiCalls = ApiCalls(context)
             apiCalls.getLiked(mIds)
+        } else {
+            recyclerView.adapter = null
         }
     }
 
