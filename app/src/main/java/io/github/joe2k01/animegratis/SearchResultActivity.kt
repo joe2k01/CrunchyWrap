@@ -55,6 +55,8 @@ class SearchResultActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(baseContext)
             .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).SEARCH_INTENT))
 
+        supportActionBar?.title = '"' + intent.getStringExtra("query")!! + '"'
+
         val apiCalls = ApiCalls(baseContext)
         apiCalls.search(intent.getStringExtra("query")!!)
     }
