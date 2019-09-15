@@ -4,10 +4,18 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_anime.*
@@ -61,6 +69,8 @@ class AnimeActivity : AppCompatActivity() {
 
         image.layoutParams.height = thumbnailHeight()
 
+        themeActivity(intent.getStringExtra("image")!!, intent.getStringExtra("title")!!)
+
         Picasso.get()
             .load(intent.getStringExtra("image"))
             .fit()
@@ -84,6 +94,55 @@ class AnimeActivity : AppCompatActivity() {
 
         ApiCalls(baseContext).getEpisodes(intent.getStringExtra("id")!!)
 
+    }
+
+    private fun themeActivity(url: String, anime: String) {
+        Thread {
+            val bitmap: Bitmap = Picasso.get().load(url).get()
+            Palette.from(bitmap).generate { palette ->
+                var bar = 0
+                var title = 0
+                var status = 0
+                var items = 0
+                if (palette?.lightVibrantSwatch != null) {
+                    bar = palette.lightVibrantSwatch!!.rgb
+                    title = palette.lightVibrantSwatch!!.titleTextColor
+                }
+                if (palette?.vibrantSwatch != null)
+                    status = palette.vibrantSwatch!!.rgb
+                if (palette?.vibrantSwatch != null)
+                    items = palette.vibrantSwatch!!.rgb
+
+                if (bar == 0 && status != 0) {
+                    bar = status
+                    title = palette?.vibrantSwatch!!.titleTextColor
+                }
+                if (items == 0 && bar != 0)
+                    items = bar
+
+                if (bar != 0) {
+                    val arrow = ContextCompat.getDrawable(baseContext, R.drawable.ic_back)
+                    val titleNoAlpha =
+                        Color.rgb(Color.red(title), Color.green(title), Color.blue(title))
+                    DrawableCompat.setTint(arrow!!, titleNoAlpha)
+
+                    supportActionBar?.apply {
+                        setBackgroundDrawable(ColorDrawable(bar))
+                        setTitle(
+                            Html.fromHtml(
+                                "<font color='" + Integer.toHexString(titleNoAlpha).substring(
+                                    2
+                                ) + "'>" + anime + "</font>"
+                            )
+                        )
+                        setHomeAsUpIndicator(arrow)
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        window.statusBarColor = status
+                }
+            }
+        }.start()
     }
 
     private fun thumbnailHeight(): Int {
