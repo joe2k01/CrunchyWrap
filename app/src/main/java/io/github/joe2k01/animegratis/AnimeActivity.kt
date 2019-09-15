@@ -44,6 +44,8 @@ class AnimeActivity : AppCompatActivity() {
                     adapter = episodesAdapter
                 }
             }
+
+            loading_a.visibility = View.GONE
         }
     }
 

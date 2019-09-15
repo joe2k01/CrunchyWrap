@@ -24,6 +24,8 @@ class StreamingActivity : AppCompatActivity() {
 
                 videoView.setOnPreparedListener {
                     progress.max = videoView.duration
+
+                    loading_v.visibility = View.GONE
                 }
 
                 videoView.setOnClickListener {

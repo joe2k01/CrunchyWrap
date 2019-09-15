@@ -27,7 +27,7 @@
             android:theme="@style/ActionBarTheme" />
         <activity
             android:name=".StreamingActivity"
-            android:theme="@style/StreamingTheme" />
+            android:theme="@style/AppTheme.StreamingTheme" />
         <activity
             android:name=".AnimeActivity"
             android:parentActivityName=".MainActivity"

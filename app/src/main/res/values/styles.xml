@@ -19,7 +19,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="StreamingTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.StreamingTheme">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>

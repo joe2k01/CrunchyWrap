@@ -12,7 +12,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_newest.*
+import kotlinx.android.synthetic.main.fragment_following.*
+import kotlinx.android.synthetic.main.fragment_newest.recyclerView
 import org.json.JSONObject
 
 /**
@@ -51,6 +52,8 @@ class FollowingFragment : Fragment() {
                     layoutManager = linearLayoutManager
                     adapter = animeAdapter
                 }
+
+                loading_f.visibility = View.GONE
             } else if (intent != null) {
                 populateLiked(context!!)
             }

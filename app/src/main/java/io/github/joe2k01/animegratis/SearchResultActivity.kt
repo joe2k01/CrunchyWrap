@@ -5,10 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_newest.*
+import kotlinx.android.synthetic.main.activity_search_result.*
+import kotlinx.android.synthetic.main.fragment_newest.recyclerView
 import org.json.JSONObject
 
 class SearchResultActivity : AppCompatActivity() {
@@ -45,6 +47,8 @@ class SearchResultActivity : AppCompatActivity() {
                     adapter = animeAdapter
                 }
             }
+
+            loading_s.visibility = View.GONE
         }
     }
 

@@ -67,6 +67,8 @@ class NewestFragment : Fragment() {
                 if (pos < 11) {
                     linearLayoutManager.scrollToPositionWithOffset(pos, offset)
                 }
+
+                loading_n.visibility = View.GONE
             } else if (intent != null) {
                 ApiCalls(context!!).getNewest()
             }
