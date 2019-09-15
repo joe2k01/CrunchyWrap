@@ -103,22 +103,17 @@ class AnimeActivity : AppCompatActivity() {
                 var bar = 0
                 var title = 0
                 var status = 0
-                var items = 0
                 if (palette?.lightVibrantSwatch != null) {
                     bar = palette.lightVibrantSwatch!!.rgb
                     title = palette.lightVibrantSwatch!!.titleTextColor
                 }
                 if (palette?.vibrantSwatch != null)
                     status = palette.vibrantSwatch!!.rgb
-                if (palette?.vibrantSwatch != null)
-                    items = palette.vibrantSwatch!!.rgb
 
                 if (bar == 0 && status != 0) {
                     bar = status
                     title = palette?.vibrantSwatch!!.titleTextColor
                 }
-                if (items == 0 && bar != 0)
-                    items = bar
 
                 if (bar != 0) {
                     val arrow = ContextCompat.getDrawable(baseContext, R.drawable.ic_back)
