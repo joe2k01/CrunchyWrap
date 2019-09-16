@@ -5,11 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.android.synthetic.main.activity_streaming.*
@@ -43,6 +45,21 @@ class StreamingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_streaming)
+
+        progress_circular.indeterminateDrawable.setColorFilter(
+            ContextCompat.getColor(
+                this,
+                R.color.colorPrimary
+            ), PorterDuff.Mode.SRC_IN
+        )
+        progress.progressDrawable.setColorFilter(
+            ContextCompat.getColor(this, R.color.colorPrimary),
+            PorterDuff.Mode.SRC_IN
+        )
+        progress.thumb.setColorFilter(
+            ContextCompat.getColor(this, R.color.colorPrimary),
+            PorterDuff.Mode.SRC_IN
+        )
 
         LocalBroadcastManager.getInstance(baseContext)
             .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).URL_INTENT))
