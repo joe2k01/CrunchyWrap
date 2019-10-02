@@ -5,6 +5,30 @@
     android:layout_height="match_parent"
     tools:context=".FollowingFragment">
 
+    <LinearLayout
+        android:id="@+id/none_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="@dimen/no_following_size"
+            android:layout_height="@dimen/no_following_size"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_thumb_up_outline" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/not_following_any"
+            android:textColor="#fff"
+            android:textSize="@dimen/no_following_text_size" />
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/loading_f"
         android:layout_width="match_parent"

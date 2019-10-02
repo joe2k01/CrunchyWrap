@@ -25,35 +25,41 @@ class FollowingFragment : Fragment() {
             if (intent != null && intent.action.equals(ApiCalls(context!!).LIKED_INTENT)) {
                 val liked = intent.getStringArrayListExtra("liked")!!
                 val size = liked.size
-                val titles = Array(size) { "" }
-                val portraitImages = Array(size) { "" }
-                val landscapeImages = Array(size) { "" }
-                val descriptions = Array(size) { "" }
-                val seriesIds = Array(size) { "" }
-                for (x in liked.indices) {
-                    val json = JSONObject(liked[x])
-                    titles[x] = json.getString("name")
-                    seriesIds[x] = json.getString("series_id")
-                    descriptions[x] = json.getString("description")
-                    val portrait = JSONObject(json.getString("portrait_image"))
-                    val landscape = JSONObject(json.getString("landscape_image"))
-                    portraitImages[x] = portrait.getString("full_url")
-                    landscapeImages[x] = landscape.getString("full_url")
+                if (size > 0) {
+                    val titles = Array(size) { "" }
+                    val portraitImages = Array(size) { "" }
+                    val landscapeImages = Array(size) { "" }
+                    val descriptions = Array(size) { "" }
+                    val seriesIds = Array(size) { "" }
+                    for (x in liked.indices) {
+                        val json = JSONObject(liked[x])
+                        titles[x] = json.getString("name")
+                        seriesIds[x] = json.getString("series_id")
+                        descriptions[x] = json.getString("description")
+                        val portrait = JSONObject(json.getString("portrait_image"))
+                        val landscape = JSONObject(json.getString("landscape_image"))
+                        portraitImages[x] = portrait.getString("full_url")
+                        landscapeImages[x] = landscape.getString("full_url")
+                    }
+
+                    val linearLayoutManager = LinearLayoutManager(context)
+                    val animeAdapter = AnimeAdapter(
+                        context!!, titles, portraitImages, landscapeImages,
+                        descriptions, seriesIds
+                    )
+
+                    recyclerView.apply {
+                        setHasFixedSize(true)
+                        layoutManager = linearLayoutManager
+                        adapter = animeAdapter
+                    }
+                    loading_f.visibility = View.GONE
+                    none_layout.visibility = View.GONE
+                } else {
+                    recyclerView.adapter = null
+                    loading_f.visibility = View.GONE
+                    none_layout.visibility = View.VISIBLE
                 }
-
-                val linearLayoutManager = LinearLayoutManager(context)
-                val animeAdapter = AnimeAdapter(
-                    context!!, titles, portraitImages, landscapeImages,
-                    descriptions, seriesIds
-                )
-
-                recyclerView.apply {
-                    setHasFixedSize(true)
-                    layoutManager = linearLayoutManager
-                    adapter = animeAdapter
-                }
-
-                loading_f.visibility = View.GONE
             } else if (intent != null) {
                 populateLiked(context!!)
             }
@@ -88,6 +94,8 @@ class FollowingFragment : Fragment() {
             apiCalls.getLiked(mIds)
         } else {
             recyclerView.adapter = null
+            loading_f.visibility = View.GONE
+            none_layout.visibility = View.VISIBLE
         }
     }
 

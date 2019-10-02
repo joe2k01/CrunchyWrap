@@ -4,9 +4,7 @@
     <string name="description_title">Descrizione</string>
     <string name="episodes_title">Episodi</string>
     <string name="episodes_placeholder">%s %s</string>
+    <string name="not_following_any">Non segui nessun anime</string>
 
     <string name="preference_file_key">PREF_FILE</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
