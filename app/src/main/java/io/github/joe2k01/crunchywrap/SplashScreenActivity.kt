@@ -1,4 +1,4 @@
-package io.github.joe2k01.animegratis
+package io.github.joe2k01.crunchywrap
 
 import android.content.Intent
 import android.os.Bundle

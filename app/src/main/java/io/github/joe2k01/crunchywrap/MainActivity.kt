@@ -1,4 +1,4 @@
-package io.github.joe2k01.animegratis
+package io.github.joe2k01.crunchywrap
 
 import android.app.SearchManager
 import android.content.Context
