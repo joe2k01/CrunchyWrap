@@ -12,6 +12,8 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ApiCalls(val context: Context) {
     lateinit var reqParam: String
@@ -32,7 +34,10 @@ class ApiCalls(val context: Context) {
         reqParam = URLEncoder.encode(
             "device_id",
             "UTF-8"
-        ) + "=" + URLEncoder.encode("efad739f-d50d-42d6-a504-f1af339393ff", "UTF-8")
+        ) + "=" + URLEncoder.encode(
+            sharedPref.getString("uuid", UUID.randomUUID().toString()),
+            "UTF-8"
+        )
         reqParam += "&" + URLEncoder.encode(
             "device_type",
             "UTF-8"
