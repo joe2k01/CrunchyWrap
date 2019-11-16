@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CrunchyWrap</string>
+    <string name="search_hint">Cerca un anime</string>
+    <string name="description_title">Descrizione</string>
+    <string name="episodes_title">Episodi</string>
+    <string name="episodes_placeholder">%s %s</string>
+    <string name="not_following_any">Non segui nessun anime</string>
+</resources>
