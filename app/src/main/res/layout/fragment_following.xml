@@ -11,13 +11,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="@dimen/no_following_size"
             android:layout_height="@dimen/no_following_size"
             android:layout_gravity="center_horizontal"
             android:layout_margin="10dp"
+            android:contentDescription="@null"
             android:src="@drawable/ic_thumb_up_outline" />
 
         <TextView

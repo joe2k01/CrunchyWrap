@@ -31,6 +31,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentBottom="true"
+            android:contentDescription="@null"
             android:src="@drawable/ic_thumb_up_outline" />
     </RelativeLayout>
 

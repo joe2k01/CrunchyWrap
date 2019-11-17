@@ -103,7 +103,7 @@ class AnimeAdapter(
                 liked = sharedPref.getString("ids", "none")
             }
 
-            val intent = Intent(ApiCalls(context).UPDATE_LIKED)
+            val intent = Intent(ApiCalls(context).updateLiked)
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
 

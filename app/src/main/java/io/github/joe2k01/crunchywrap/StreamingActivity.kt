@@ -62,7 +62,7 @@ class StreamingActivity : AppCompatActivity() {
         )
 
         LocalBroadcastManager.getInstance(baseContext)
-            .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).URL_INTENT))
+            .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).urlIntent))
 
         window.decorView.apply {
             systemUiVisibility =

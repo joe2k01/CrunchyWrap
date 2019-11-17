@@ -22,7 +22,7 @@ import org.json.JSONObject
 class FollowingFragment : Fragment() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
-            if (intent != null && intent.action.equals(ApiCalls(context!!).LIKED_INTENT)) {
+            if (intent != null && intent.action.equals(ApiCalls(context!!).likedIntent)) {
                 val liked = intent.getStringArrayListExtra("liked")!!
                 val size = liked.size
                 if (size > 0) {
@@ -71,10 +71,10 @@ class FollowingFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         LocalBroadcastManager.getInstance(context!!)
-            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).LIKED_INTENT))
+            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).likedIntent))
 
         LocalBroadcastManager.getInstance(context!!)
-            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).UPDATE_LIKED))
+            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).updateLiked))
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_following, container, false)

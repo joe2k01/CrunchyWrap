@@ -57,7 +57,7 @@ class SearchResultActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search_result)
 
         LocalBroadcastManager.getInstance(baseContext)
-            .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).SEARCH_INTENT))
+            .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).searchIntent))
 
         supportActionBar?.title = '"' + intent.getStringExtra("query")!! + '"'
 

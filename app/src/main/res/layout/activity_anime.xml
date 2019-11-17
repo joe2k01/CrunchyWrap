@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#424242"
     tools:context=".AnimeActivity">
 
     <RelativeLayout
@@ -32,7 +31,8 @@
             <ImageView
                 android:id="@+id/image"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:contentDescription="@null" />
 
             <RelativeLayout
                 android:id="@+id/description_layout"
@@ -49,6 +49,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="10dp"
+                    android:layout_toStartOf="@id/more"
                     android:text="@string/description_title"
                     android:textColor="#fff"
                     android:textSize="16sp"
@@ -62,6 +63,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_gravity="end"
                     android:layout_margin="10dp"
+                    android:contentDescription="@null"
                     android:src="@drawable/ic_arrow" />
 
                 <TextView

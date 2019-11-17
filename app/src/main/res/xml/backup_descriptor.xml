@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude shared preferences to rebuild device UUID, just because -->
+    <exclude
+        domain="sharedpref"
+        path="." />
+</full-backup-content>

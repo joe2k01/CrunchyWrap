@@ -81,7 +81,7 @@ class AnimeActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         sharedPreferences.edit().putString("locale", "").apply()
 
         LocalBroadcastManager.getInstance(baseContext)
-            .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).EPISODES_INTENT))
+            .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).episodesIntent))
 
         supportActionBar?.title = intent.getStringExtra("title")
         description.text = intent.getStringExtra("description")

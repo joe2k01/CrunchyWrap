@@ -16,22 +16,21 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ApiCalls(val context: Context) {
-    lateinit var reqParam: String
+    private lateinit var reqParam: String
 
-    val LIKED_INTENT = "io.github.joe2k01.following"
-    val LOCALES_INTENT = "io.github.joe2k01.locales"
-    val NEWEST_INTENT = "io.github.joe2k01.newest"
-    val EPISODES_INTENT = "io.github.joe2k01.episodes"
-    val SEARCH_INTENT = "io.github.joe2k01.search"
-    val URL_INTENT = "io.github.joe2k01.url"
+    val likedIntent = "io.github.joe2k01.following"
+    val newestIntent = "io.github.joe2k01.newest"
+    val episodesIntent = "io.github.joe2k01.episodes"
+    val searchIntent = "io.github.joe2k01.search"
+    val urlIntent = "io.github.joe2k01.url"
 
-    val UPDATE_LIKED = "io.github.joe2k01.update_liked"
+    val updateLiked = "io.github.joe2k01.update_liked"
 
     private val sharedPref: SharedPreferences = context.getSharedPreferences(
         context.resources.getString(R.string.preference_file_key), Context.MODE_PRIVATE
     )
 
-    fun clearParam() {
+    private fun clearParam() {
         reqParam = URLEncoder.encode(
             "device_id",
             "UTF-8"
@@ -127,7 +126,7 @@ class ApiCalls(val context: Context) {
 
     fun getNewest() {
         clearParam()
-        var seriesArray = arrayOfNulls<String>(10)
+        val seriesArray = arrayOfNulls<String>(10)
         val sessionId = sharedPref.getString("session_id", "null")
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
             sessionId,
@@ -170,7 +169,7 @@ class ApiCalls(val context: Context) {
                 }
             }
 
-            val intent = Intent(NEWEST_INTENT)
+            val intent = Intent(newestIntent)
             intent.putExtra("newest", seriesArray)
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
@@ -179,7 +178,7 @@ class ApiCalls(val context: Context) {
 
     fun getLiked(ids: Array<String>) {
         clearParam()
-        var seriesArray = ArrayList<String>()
+        val seriesArray = ArrayList<String>()
         val sessionId = sharedPref.getString("session_id", "null")
         val originalParam = reqParam
 
@@ -222,7 +221,7 @@ class ApiCalls(val context: Context) {
                         seriesArray.add(JSONObject(response.toString()).get("data").toString())
                     }
 
-                    val intent = Intent(LIKED_INTENT)
+                    val intent = Intent(likedIntent)
                     intent.putExtra("liked", seriesArray)
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
                 }
@@ -233,7 +232,7 @@ class ApiCalls(val context: Context) {
 
     fun search(query: String) {
         clearParam()
-        var seriesArray = ArrayList<String>()
+        val seriesArray = ArrayList<String>()
         val sessionId = sharedPref.getString("session_id", "null")
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
             sessionId,
@@ -275,7 +274,7 @@ class ApiCalls(val context: Context) {
                     }
                 }
 
-                val intent = Intent(SEARCH_INTENT)
+                val intent = Intent(searchIntent)
                 intent.putExtra("results", seriesArray)
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
             }
@@ -285,7 +284,7 @@ class ApiCalls(val context: Context) {
 
     fun getEpisodes(seriesId: String) {
         clearParam()
-        var episodes = ArrayList<String>()
+        val episodes = ArrayList<String>()
         val sessionId = sharedPref.getString("session_id", "null")
 
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
@@ -328,7 +327,7 @@ class ApiCalls(val context: Context) {
                 }
             }
 
-            val intent = Intent(EPISODES_INTENT)
+            val intent = Intent(episodesIntent)
             intent.putExtra("episodes", episodes)
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }
@@ -338,7 +337,7 @@ class ApiCalls(val context: Context) {
     fun getStreamingLink(mediaId: String, locale: String) {
         clearParam()
         var url = ""
-        var sessionId = sharedPref.getString("session_id", "null")
+        val sessionId = sharedPref.getString("session_id", "null")
         reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
             sessionId,
             "UTF-8"
@@ -383,12 +382,13 @@ class ApiCalls(val context: Context) {
                     val streamData = JSONObject(dataObject).get("stream_data").toString()
                     val streams = JSONObject(streamData).get("streams").toString()
                     val array = JSONArray(streams)
+                    //TODO: check that there are available links. My Hero Academia does not seem to provide any
                     val adaptiveObject = JSONObject(array.get(0).toString())
                     url = adaptiveObject.getString("url")
                 }
             }
 
-            val intent = Intent(URL_INTENT)
+            val intent = Intent(urlIntent)
             intent.putExtra("url", url)
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
         }

@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000"
     tools:context=".StreamingActivity">
 
     <VideoView
@@ -24,6 +23,7 @@
             android:layout_width="48dp"
             android:layout_height="49dp"
             android:layout_centerHorizontal="true"
+            android:contentDescription="@null"
             android:src="@drawable/ic_pause" />
 
         <SeekBar

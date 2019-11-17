@@ -23,7 +23,7 @@ class NewestFragment : Fragment() {
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
-            if (intent != null && intent.action.equals(ApiCalls(context!!).NEWEST_INTENT)) {
+            if (intent != null && intent.action.equals(ApiCalls(context!!).newestIntent)) {
                 val newest = intent.getStringArrayExtra("newest")!!
                 val size = newest.size
                 val titles = Array(size) { "" }
@@ -80,10 +80,10 @@ class NewestFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         LocalBroadcastManager.getInstance(context!!)
-            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).NEWEST_INTENT))
+            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).newestIntent))
 
         LocalBroadcastManager.getInstance(context!!)
-            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).UPDATE_LIKED))
+            .registerReceiver(receiver, IntentFilter(ApiCalls(context!!).updateLiked))
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_newest, container, false)
