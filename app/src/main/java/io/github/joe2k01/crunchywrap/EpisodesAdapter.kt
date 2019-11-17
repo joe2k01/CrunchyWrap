@@ -24,6 +24,11 @@ class EpisodesAdapter(
     class EpisodesViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     private val metrics: DisplayMetrics = context.resources.displayMetrics
+    private val sharedPreferences =
+        context.getSharedPreferences(
+            context.getString(R.string.preference_file_key),
+            Context.MODE_PRIVATE
+        )
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodesViewHolder {
         val layout =
@@ -61,6 +66,7 @@ class EpisodesAdapter(
         item.setOnClickListener {
             val episode = Intent(holder.view.context, StreamingActivity::class.java)
             episode.putExtra("id", mediaIds[position])
+            episode.putExtra("locale", sharedPreferences.getString("locale", ""))
             holder.view.context.startActivity(episode)
         }
     }

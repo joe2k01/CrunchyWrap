@@ -69,7 +69,10 @@ class StreamingActivity : AppCompatActivity() {
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         }
 
-        ApiCalls(baseContext).getStreamingLink(intent.getStringExtra("id")!!)
+        ApiCalls(baseContext).getStreamingLink(
+            intent.getStringExtra("id")!!,
+            intent.getStringExtra("locale")!!
+        )
 
         progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) {}

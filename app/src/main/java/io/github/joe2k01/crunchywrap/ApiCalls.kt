@@ -19,6 +19,7 @@ class ApiCalls(val context: Context) {
     lateinit var reqParam: String
 
     val LIKED_INTENT = "io.github.joe2k01.following"
+    val LOCALES_INTENT = "io.github.joe2k01.locales"
     val NEWEST_INTENT = "io.github.joe2k01.newest"
     val EPISODES_INTENT = "io.github.joe2k01.episodes"
     val SEARCH_INTENT = "io.github.joe2k01.search"
@@ -85,6 +86,41 @@ class ApiCalls(val context: Context) {
             }
         }
 
+        t.start()
+        t.join()
+    }
+
+    fun getLocales() {
+        clearParam()
+        val sessionId = sharedPref.getString("session_id", "null")
+        reqParam += "&" + URLEncoder.encode("session_id", "UTF-8") + "=" + URLEncoder.encode(
+            sessionId,
+            "UTF-8"
+        )
+        val t = Thread {
+            val mUrl = URL("https://api.crunchyroll.com/list_locales.0.json")
+            with(mUrl.openConnection() as HttpURLConnection) {
+                requestMethod = "POST"
+
+                val wr = OutputStreamWriter(outputStream)
+                wr.write(reqParam)
+                wr.flush()
+
+                BufferedReader(InputStreamReader(inputStream)).use {
+                    val response = StringBuffer()
+
+                    var inputLine = it.readLine()
+                    while (inputLine != null) {
+                        response.append(inputLine)
+                        inputLine = it.readLine()
+                    }
+                    it.close()
+                    val dataObject = JSONObject(response.toString()).get("data").toString()
+                    val array = JSONArray(dataObject)
+                    sharedPref.edit().putString("locales", array.toString()).apply()
+                }
+            }
+        }
         t.start()
         t.join()
     }
@@ -299,7 +335,7 @@ class ApiCalls(val context: Context) {
         t.start()
     }
 
-    fun getStreamingLink(mediaId: String) {
+    fun getStreamingLink(mediaId: String, locale: String) {
         clearParam()
         var url = ""
         var sessionId = sharedPref.getString("session_id", "null")
@@ -307,6 +343,14 @@ class ApiCalls(val context: Context) {
             sessionId,
             "UTF-8"
         )
+
+        if (locale != "") {
+            reqParam += "&" + URLEncoder.encode("locale", "UTF-8") + "=" + URLEncoder.encode(
+                locale,
+                "UTF-8"
+            )
+        }
+
         reqParam += "&" + URLEncoder.encode("media_id", "UTF-8") + "=" + URLEncoder.encode(
             mediaId,
             "UTF-8"

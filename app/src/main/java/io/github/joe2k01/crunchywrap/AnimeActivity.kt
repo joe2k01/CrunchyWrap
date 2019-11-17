@@ -1,16 +1,17 @@
 package io.github.joe2k01.crunchywrap
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -19,9 +20,23 @@ import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_anime.*
+import org.json.JSONArray
 import org.json.JSONObject
 
-class AnimeActivity : AppCompatActivity() {
+
+class AnimeActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+    private lateinit var localeIds: ArrayList<String>
+    private lateinit var sharedPreferences: SharedPreferences
+    override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        if (position != 0)
+            sharedPreferences.edit().putString("locale", localeIds[position - 1]).apply()
+        else
+            sharedPreferences.edit().putString("locale", "").apply()
+    }
+
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
             if (intent != null) {
@@ -61,6 +76,10 @@ class AnimeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_anime)
 
+        sharedPreferences =
+            getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString("locale", "").apply()
+
         LocalBroadcastManager.getInstance(baseContext)
             .registerReceiver(receiver, IntentFilter(ApiCalls(baseContext).EPISODES_INTENT))
 
@@ -92,8 +111,25 @@ class AnimeActivity : AppCompatActivity() {
             description.maxLines = maxLines
         }
 
+        val array = JSONArray(sharedPreferences.getString("locales", ""))
+        localeIds = ArrayList()
+        val locales = ArrayList<String>()
+
+        locales.add(getString(R.string.default_locale))
+
+        for (x in 0 until array.length()) {
+            val locale = JSONObject(array.get(x).toString())
+            localeIds.add(locale.get("locale_id").toString())
+            locales.add(locale.get("label").toString())
+        }
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, locales)
+        locale_picker.adapter = adapter
+
         ApiCalls(baseContext).getEpisodes(intent.getStringExtra("id")!!)
 
+        locale_picker.onItemSelectedListener = this
+        locale_picker.background.colorFilter =
+            PorterDuffColorFilter(resources.getColor(R.color.colorAccent), PorterDuff.Mode.SRC_ATOP)
     }
 
     private fun themeActivity(url: String, anime: String) {

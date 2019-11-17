@@ -19,6 +19,7 @@ class SplashScreenActivity : AppCompatActivity() {
         }
 
         ApiCalls(this).authenticate()
+        ApiCalls(this).getLocales()
 
         val main = Intent(this, MainActivity::class.java)
         startActivity(main)
