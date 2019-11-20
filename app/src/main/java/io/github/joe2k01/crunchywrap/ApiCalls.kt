@@ -382,9 +382,10 @@ class ApiCalls(val context: Context) {
                     val streamData = JSONObject(dataObject).get("stream_data").toString()
                     val streams = JSONObject(streamData).get("streams").toString()
                     val array = JSONArray(streams)
-                    //TODO: check that there are available links. My Hero Academia does not seem to provide any
-                    val adaptiveObject = JSONObject(array.get(0).toString())
-                    url = adaptiveObject.getString("url")
+                    if (array.length() > 0) {
+                        val adaptiveObject = JSONObject(array.get(0).toString())
+                        url = adaptiveObject.getString("url")
+                    }
                 }
             }
 

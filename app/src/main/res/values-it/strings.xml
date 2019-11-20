@@ -7,4 +7,5 @@
     <string name="episodes_title">Episodi</string>
     <string name="episodes_placeholder">%s %s</string>
     <string name="not_following_any">Non segui nessun anime</string>
+    <string name="went_wrong">Qualcosa è andato storto</string>
 </resources>

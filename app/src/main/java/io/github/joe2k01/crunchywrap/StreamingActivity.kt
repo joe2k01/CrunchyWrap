@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_streaming.*
 
 class StreamingActivity : AppCompatActivity() {
@@ -21,22 +22,30 @@ class StreamingActivity : AppCompatActivity() {
         override fun onReceive(p0: Context?, intent: Intent?) {
             if (intent != null) {
                 val url = intent.getStringExtra("url")!!
-                videoView.setVideoURI(Uri.parse(url))
-                videoView.start()
+                if (url != "") {
+                    videoView.setVideoURI(Uri.parse(url))
+                    videoView.start()
 
-                videoView.setOnPreparedListener {
-                    progress.max = videoView.duration
+                    videoView.setOnPreparedListener {
+                        progress.max = videoView.duration
 
-                    loading_v.visibility = View.GONE
-                }
-
-                videoView.setOnClickListener {
-                    if (controls.isVisible)
-                        controls.visibility = View.GONE
-                    else {
-                        progress.progress = videoView.currentPosition
-                        controls.visibility = View.VISIBLE
+                        loading_v.visibility = View.GONE
                     }
+
+                    videoView.setOnClickListener {
+                        if (controls.isVisible)
+                            controls.visibility = View.GONE
+                        else {
+                            progress.progress = videoView.currentPosition
+                            controls.visibility = View.VISIBLE
+                        }
+                    }
+                } else {
+                    Snackbar.make(controls, R.string.went_wrong, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(android.R.string.ok, View.OnClickListener {
+                            finish()
+                        })
+                        .show()
                 }
             }
         }
