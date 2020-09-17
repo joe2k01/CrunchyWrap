@@ -8,6 +8,8 @@ import android.content.pm.ActivityInfo
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,8 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_streaming.*
 
 class StreamingActivity : AppCompatActivity() {
+    private lateinit var updateProgress: Runnable
+    private lateinit var myHandler: Handler
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
             if (intent != null) {
@@ -30,6 +34,8 @@ class StreamingActivity : AppCompatActivity() {
                         progress.max = videoView.duration
 
                         loading_v.visibility = View.GONE
+
+                        myHandler.postDelayed(updateProgress, 1000)
                     }
 
                     videoView.setOnClickListener {
@@ -103,6 +109,12 @@ class StreamingActivity : AppCompatActivity() {
                 videoView.start()
             }
         }
+
+        myHandler = Handler(Looper.getMainLooper())
+        updateProgress = Runnable {
+            progress.progress = videoView.currentPosition
+            myHandler.postDelayed(updateProgress, 1000)
+        }
     }
 
     override fun onStart() {
@@ -112,6 +124,7 @@ class StreamingActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         LocalBroadcastManager.getInstance(baseContext).unregisterReceiver(receiver)
+        myHandler.removeCallbacks(updateProgress)
 
         super.onDestroy()
     }
