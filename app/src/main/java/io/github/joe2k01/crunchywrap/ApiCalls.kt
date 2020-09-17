@@ -378,13 +378,15 @@ class ApiCalls(val context: Context) {
                         inputLine = it.readLine()
                     }
                     it.close()
-                    val dataObject = JSONObject(response.toString()).get("data").toString()
-                    val streamData = JSONObject(dataObject).get("stream_data").toString()
-                    val streams = JSONObject(streamData).get("streams").toString()
-                    val array = JSONArray(streams)
-                    if (array.length() > 0) {
-                        val adaptiveObject = JSONObject(array.get(0).toString())
-                        url = adaptiveObject.getString("url")
+                    if (response.toString().contains("url")) {
+                        val dataObject = JSONObject(response.toString()).get("data").toString()
+                        val streamData = JSONObject(dataObject).get("stream_data").toString()
+                        val streams = JSONObject(streamData).get("streams").toString()
+                        val array = JSONArray(streams)
+                        if (array.length() > 0) {
+                            val adaptiveObject = JSONObject(array.get(0).toString())
+                            url = adaptiveObject.getString("url")
+                        }
                     }
                 }
             }
