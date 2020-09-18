@@ -14,7 +14,6 @@ import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
@@ -104,19 +103,17 @@ class StreamingActivity : AppCompatActivity() {
         play.setOnClickListener {
             if (videoView.isPlaying) {
                 play.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        this.resources,
-                        R.drawable.ic_play,
-                        null
+                    ContextCompat.getDrawable(
+                        this,
+                        R.drawable.ic_play
                     )
                 )
                 videoView.pause()
             } else {
                 play.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        this.resources,
-                        R.drawable.ic_pause,
-                        null
+                    ContextCompat.getDrawable(
+                        this,
+                        R.drawable.ic_pause
                     )
                 )
                 videoView.start()

@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
@@ -63,18 +63,16 @@ class AnimeAdapter(
 
         if (alreadyLiked)
             like.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    hContext.resources,
-                    R.drawable.ic_thumb_up,
-                    null
+                ContextCompat.getDrawable(
+                    hContext,
+                    R.drawable.ic_thumb_up
                 )
             )
         else
             like.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    hContext.resources,
+                ContextCompat.getDrawable(
+                    hContext,
                     R.drawable.ic_thumb_up_outline,
-                    null
                 )
             )
 
@@ -87,10 +85,9 @@ class AnimeAdapter(
             alreadyLiked = liked!!.contains(serieIds[position])
             if (!alreadyLiked) {
                 like.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        hContext.resources,
+                    ContextCompat.getDrawable(
+                        hContext,
                         R.drawable.ic_thumb_up,
-                        null
                     )
                 )
 
@@ -111,10 +108,9 @@ class AnimeAdapter(
                 liked = sharedPref.getString("ids", "none")
             } else {
                 like.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        hContext.resources,
+                    ContextCompat.getDrawable(
+                        hContext,
                         R.drawable.ic_thumb_up_outline,
-                        null
                     )
                 )
 
