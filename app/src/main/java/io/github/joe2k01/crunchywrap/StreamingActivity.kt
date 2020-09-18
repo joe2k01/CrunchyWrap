@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
@@ -48,9 +49,9 @@ class StreamingActivity : AppCompatActivity() {
                     }
                 } else {
                     Snackbar.make(controls, R.string.went_wrong, Snackbar.LENGTH_INDEFINITE)
-                        .setAction(android.R.string.ok, View.OnClickListener {
+                        .setAction(android.R.string.ok) {
                             finish()
-                        })
+                        }
                         .show()
                 }
             }
@@ -102,10 +103,22 @@ class StreamingActivity : AppCompatActivity() {
 
         play.setOnClickListener {
             if (videoView.isPlaying) {
-                play.setImageDrawable(resources.getDrawable(R.drawable.ic_play))
+                play.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        this.resources,
+                        R.drawable.ic_play,
+                        null
+                    )
+                )
                 videoView.pause()
             } else {
-                play.setImageDrawable(resources.getDrawable(R.drawable.ic_pause))
+                play.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        this.resources,
+                        R.drawable.ic_pause,
+                        null
+                    )
+                )
                 videoView.start()
             }
         }

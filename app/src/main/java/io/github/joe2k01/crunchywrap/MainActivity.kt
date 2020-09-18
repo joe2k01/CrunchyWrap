@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -22,11 +24,14 @@ class MainActivity : AppCompatActivity() {
         tab_layout.setupWithViewPager(viewpager)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tab_layout.getTabAt(0)?.icon = getDrawable(R.drawable.ic_thumb_up)
-            tab_layout.getTabAt(1)?.icon = getDrawable(R.drawable.ic_new)
+            tab_layout.getTabAt(0)?.icon =
+                ContextCompat.getDrawable(baseContext, R.drawable.ic_thumb_up)
+            tab_layout.getTabAt(1)?.icon = ContextCompat.getDrawable(baseContext, R.drawable.ic_new)
         } else {
-            tab_layout.getTabAt(0)?.icon = resources.getDrawable(R.drawable.ic_thumb_up)
-            tab_layout.getTabAt(1)?.icon = resources.getDrawable(R.drawable.ic_new)
+            tab_layout.getTabAt(0)?.icon =
+                ResourcesCompat.getDrawable(baseContext.resources, R.drawable.ic_thumb_up, null)
+            tab_layout.getTabAt(1)?.icon =
+                ResourcesCompat.getDrawable(baseContext.resources, R.drawable.ic_new, null)
         }
     }
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
@@ -61,9 +62,21 @@ class AnimeAdapter(
         title.text = titles[position]
 
         if (alreadyLiked)
-            like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up))
+            like.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    hContext.resources,
+                    R.drawable.ic_thumb_up,
+                    null
+                )
+            )
         else
-            like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up_outline))
+            like.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    hContext.resources,
+                    R.drawable.ic_thumb_up_outline,
+                    null
+                )
+            )
 
         Picasso.get()
             .load(portraitImages[position])
@@ -73,7 +86,13 @@ class AnimeAdapter(
         like.setOnClickListener {
             alreadyLiked = liked!!.contains(serieIds[position])
             if (!alreadyLiked) {
-                like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up))
+                like.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        hContext.resources,
+                        R.drawable.ic_thumb_up,
+                        null
+                    )
+                )
 
                 val animeId = serieIds[position]
 
@@ -91,7 +110,13 @@ class AnimeAdapter(
 
                 liked = sharedPref.getString("ids", "none")
             } else {
-                like.setImageDrawable(hContext.resources.getDrawable(R.drawable.ic_thumb_up_outline))
+                like.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        hContext.resources,
+                        R.drawable.ic_thumb_up_outline,
+                        null
+                    )
+                )
 
                 val animeId = serieIds[position]
 
