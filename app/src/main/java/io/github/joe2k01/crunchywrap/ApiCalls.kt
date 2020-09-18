@@ -4,13 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
 import java.net.URLEncoder
 import java.util.*
 import kotlin.collections.ArrayList
@@ -18,6 +16,7 @@ import kotlin.collections.ArrayList
 class ApiCalls(val context: Context) {
     private lateinit var reqParam: String
 
+    val authenticateIntent = "io.github.joe2k01.authenticate"
     val likedIntent = "io.github.joe2k01.following"
     val newestIntent = "io.github.joe2k01.newest"
     val episodesIntent = "io.github.joe2k01.episodes"
@@ -54,41 +53,25 @@ class ApiCalls(val context: Context) {
 
     fun authenticate() {
         clearParam()
-        var sessionId = ""
-        val t = Thread {
-            val mURL = URL("https://api.crunchyroll.com/start_session.0.json")
+        val mURL = "https://api.crunchyroll.com/start_session.0.json?$reqParam"
+        val queue = Volley.newRequestQueue(context)
 
-            with(mURL.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
+        val request = StringRequest(
+            Request.Method.GET, mURL,
+            { response ->
+                if (response.contains("session_id")) {
+                    val dataObject = JSONObject(response.toString()).get("data")
+                    val sessionId = JSONObject(dataObject.toString()).get("session_id").toString()
 
-                val wr = OutputStreamWriter(outputStream)
-                wr.write(reqParam)
-                wr.flush()
-
-                BufferedReader(InputStreamReader(inputStream)).use {
-                    val response = StringBuffer()
-
-                    var inputLine = it.readLine()
-                    while (inputLine != null) {
-                        response.append(inputLine)
-                        inputLine = it.readLine()
-                    }
-                    it.close()
-                    if (response.toString().contains("session_id")) {
-                        val dataObject = JSONObject(response.toString()).get("data")
-                        sessionId = JSONObject(dataObject.toString()).get("session_id").toString()
-                    }
+                    sharedPref.edit().putString("session_id", sessionId).apply()
                 }
-            }
+                val intent = Intent(authenticateIntent)
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            },
+            null
+        )
 
-            with(sharedPref.edit()) {
-                putString("session_id", sessionId)
-                apply()
-            }
-        }
-
-        t.start()
-        t.join()
+        queue.add(request)
     }
 
     fun getLocales() {
@@ -98,32 +81,21 @@ class ApiCalls(val context: Context) {
             sessionId,
             "UTF-8"
         )
-        val t = Thread {
-            val mUrl = URL("https://api.crunchyroll.com/list_locales.0.json")
-            with(mUrl.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
 
-                val wr = OutputStreamWriter(outputStream)
-                wr.write(reqParam)
-                wr.flush()
+        val mURL = "https://api.crunchyroll.com/list_locales.0.json?$reqParam"
+        val queue = Volley.newRequestQueue(context)
 
-                BufferedReader(InputStreamReader(inputStream)).use {
-                    val response = StringBuffer()
+        val request = StringRequest(
+            Request.Method.GET, mURL,
+            { response ->
+                val dataObject = JSONObject(response.toString()).get("data").toString()
+                val array = JSONArray(dataObject)
+                sharedPref.edit().putString("locales", array.toString()).apply()
+            },
+            null
+        )
 
-                    var inputLine = it.readLine()
-                    while (inputLine != null) {
-                        response.append(inputLine)
-                        inputLine = it.readLine()
-                    }
-                    it.close()
-                    val dataObject = JSONObject(response.toString()).get("data").toString()
-                    val array = JSONArray(dataObject)
-                    sharedPref.edit().putString("locales", array.toString()).apply()
-                }
-            }
-        }
-        t.start()
-        t.join()
+        queue.add(request)
     }
 
     fun getNewest() {
@@ -144,38 +116,26 @@ class ApiCalls(val context: Context) {
             "UTF-8"
         )
 
-        val t = Thread {
-            val mURL = URL("https://api.crunchyroll.com/list_series.0.json")
+        val mURL = "https://api.crunchyroll.com/list_series.0.json?$reqParam"
+        val queue = Volley.newRequestQueue(context)
 
-            with(mURL.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
-
-                val wr = OutputStreamWriter(outputStream)
-                wr.write(reqParam)
-                wr.flush()
-
-                BufferedReader(InputStreamReader(inputStream)).use {
-                    val response = StringBuffer()
-
-                    var inputLine = it.readLine()
-                    while (inputLine != null) {
-                        response.append(inputLine)
-                        inputLine = it.readLine()
-                    }
-                    it.close()
-                    val dataObject = JSONObject(response.toString()).get("data").toString()
-                    val array = JSONArray(dataObject)
-                    for (x in 0 until array.length()) {
-                        seriesArray[x] = array.get(x).toString()
-                    }
+        val request = StringRequest(
+            Request.Method.GET, mURL,
+            { response ->
+                val dataObject = JSONObject(response.toString()).get("data").toString()
+                val array = JSONArray(dataObject)
+                for (x in 0 until array.length()) {
+                    seriesArray[x] = array.get(x).toString()
                 }
-            }
 
-            val intent = Intent(newestIntent)
-            intent.putExtra("newest", seriesArray)
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-        }
-        t.start()
+                val intent = Intent(newestIntent)
+                intent.putExtra("newest", seriesArray)
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            },
+            null
+        )
+
+        queue.add(request)
     }
 
     fun getLiked(ids: Array<String>) {
@@ -184,52 +144,40 @@ class ApiCalls(val context: Context) {
         val sessionId = sharedPref.getString("session_id", "null")
         val originalParam = reqParam
 
-        val t = Thread {
-            val mURL = URL("https://api.crunchyroll.com/info.0.json")
+        val queue = Volley.newRequestQueue(context)
 
-            for (x in 0..(ids.size - 2)) {
-                reqParam = originalParam
-                reqParam += "&" + URLEncoder.encode(
-                    "session_id",
-                    "UTF-8"
-                ) + "=" + URLEncoder.encode(
-                    sessionId,
-                    "UTF-8"
-                )
-                reqParam += "&" + URLEncoder.encode(
-                    "series_id",
-                    "UTF-8"
-                ) + "=" + URLEncoder.encode(
-                    ids[x],
-                    "UTF-8"
-                )
+        for (x in 0..(ids.size - 2)) {
+            reqParam = originalParam
+            reqParam += "&" + URLEncoder.encode(
+                "session_id",
+                "UTF-8"
+            ) + "=" + URLEncoder.encode(
+                sessionId,
+                "UTF-8"
+            )
+            reqParam += "&" + URLEncoder.encode(
+                "series_id",
+                "UTF-8"
+            ) + "=" + URLEncoder.encode(
+                ids[x],
+                "UTF-8"
+            )
 
-                with(mURL.openConnection() as HttpURLConnection) {
-                    requestMethod = "POST"
-
-                    val wr = OutputStreamWriter(outputStream)
-                    wr.write(reqParam)
-                    wr.flush()
-
-                    BufferedReader(InputStreamReader(inputStream)).use {
-                        val response = StringBuffer()
-
-                        var inputLine = it.readLine()
-                        while (inputLine != null) {
-                            response.append(inputLine)
-                            inputLine = it.readLine()
-                        }
-                        it.close()
-                        seriesArray.add(JSONObject(response.toString()).get("data").toString())
-                    }
+            val mURL = "https://api.crunchyroll.com/info.0.json?$reqParam"
+            val request = StringRequest(
+                Request.Method.GET, mURL,
+                { response ->
+                    seriesArray.add(JSONObject(response).get("data").toString())
 
                     val intent = Intent(likedIntent)
                     intent.putExtra("liked", seriesArray)
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-                }
-            }
+                },
+                null
+            )
+
+            queue.add(request)
         }
-        t.start()
     }
 
     fun search(query: String) {
@@ -250,38 +198,26 @@ class ApiCalls(val context: Context) {
             "UTF-8"
         )
 
-        val t = Thread {
-            val mURL = URL("https://api.crunchyroll.com/autocomplete.0.json")
+        val mURL = "https://api.crunchyroll.com/autocomplete.0.json?$reqParam"
+        val queue = Volley.newRequestQueue(context)
 
-            with(mURL.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
-
-                val wr = OutputStreamWriter(outputStream)
-                wr.write(reqParam)
-                wr.flush()
-
-                BufferedReader(InputStreamReader(inputStream)).use {
-                    val response = StringBuffer()
-
-                    var inputLine = it.readLine()
-                    while (inputLine != null) {
-                        response.append(inputLine)
-                        inputLine = it.readLine()
-                    }
-                    it.close()
-                    val dataObject = JSONObject(response.toString()).get("data").toString()
-                    val array = JSONArray(dataObject)
-                    for (x in 0 until array.length()) {
-                        seriesArray.add(array.get(x).toString())
-                    }
+        val request = StringRequest(
+            Request.Method.GET, mURL,
+            { response ->
+                val dataObject = JSONObject(response.toString()).get("data").toString()
+                val array = JSONArray(dataObject)
+                for (x in 0 until array.length()) {
+                    seriesArray.add(array.get(x).toString())
                 }
 
                 val intent = Intent(searchIntent)
                 intent.putExtra("results", seriesArray)
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-            }
-        }
-        t.start()
+            },
+            null
+        )
+
+        queue.add(request)
     }
 
     fun getEpisodes(seriesId: String) {
@@ -302,38 +238,26 @@ class ApiCalls(val context: Context) {
             "UTF-8"
         )
 
-        val t = Thread {
-            val mURL = URL("https://api.crunchyroll.com/list_media.0.json")
+        val mURL = "https://api.crunchyroll.com/list_media.0.json?$reqParam"
+        val queue = Volley.newRequestQueue(context)
 
-            with(mURL.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
-
-                val wr = OutputStreamWriter(outputStream)
-                wr.write(reqParam)
-                wr.flush()
-
-                BufferedReader(InputStreamReader(inputStream)).use {
-                    val response = StringBuffer()
-
-                    var inputLine = it.readLine()
-                    while (inputLine != null) {
-                        response.append(inputLine)
-                        inputLine = it.readLine()
-                    }
-                    it.close()
-                    val dataObject = JSONObject(response.toString()).get("data").toString()
-                    val array = JSONArray(dataObject)
-                    for (x in 0 until array.length()) {
-                        episodes.add(array.get(x).toString())
-                    }
+        val request = StringRequest(
+            Request.Method.GET, mURL,
+            { response ->
+                val dataObject = JSONObject(response.toString()).get("data").toString()
+                val array = JSONArray(dataObject)
+                for (x in 0 until array.length()) {
+                    episodes.add(array.get(x).toString())
                 }
-            }
 
-            val intent = Intent(episodesIntent)
-            intent.putExtra("episodes", episodes)
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-        }
-        t.start()
+                val intent = Intent(episodesIntent)
+                intent.putExtra("episodes", episodes)
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            },
+            null
+        )
+
+        queue.add(request)
     }
 
     fun getStreamingLink(mediaId: String, locale: String) {
@@ -361,42 +285,35 @@ class ApiCalls(val context: Context) {
             "UTF-8"
         )
 
-        val t = Thread {
-            val mURL = URL("https://api.crunchyroll.com/info.0.json")
+        val mURL = "https://api.crunchyroll.com/info.0.json?$reqParam"
+        val queue = Volley.newRequestQueue(context)
 
-            with(mURL.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
-
-                val wr = OutputStreamWriter(outputStream)
-                wr.write(reqParam)
-                wr.flush()
-
-                BufferedReader(InputStreamReader(inputStream)).use {
-                    val response = StringBuffer()
-
-                    var inputLine = it.readLine()
-                    while (inputLine != null) {
-                        response.append(inputLine)
-                        inputLine = it.readLine()
-                    }
-                    it.close()
-                    if (response.toString().contains("url")) {
-                        val dataObject = JSONObject(response.toString()).get("data").toString()
-                        val streamData = JSONObject(dataObject).get("stream_data").toString()
-                        val streams = JSONObject(streamData).get("streams").toString()
-                        val array = JSONArray(streams)
-                        if (array.length() > 0) {
-                            val adaptiveObject = JSONObject(array.get(0).toString())
-                            url = adaptiveObject.getString("url")
-                        }
+        val request = StringRequest(
+            Request.Method.GET, mURL,
+            { response ->
+                if (response.toString().contains("url")) {
+                    val dataObject = JSONObject(response.toString()).get("data").toString()
+                    val streamData = JSONObject(dataObject).get("stream_data").toString()
+                    val streams = JSONObject(streamData).get("streams").toString()
+                    val array = JSONArray(streams)
+                    if (array.length() > 0) {
+                        val adaptiveObject = JSONObject(array.get(0).toString())
+                        url = adaptiveObject.getString("url")
                     }
                 }
-            }
 
-            val intent = Intent(urlIntent)
-            intent.putExtra("url", url)
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-        }
-        t.start()
+                val intent = Intent(urlIntent)
+                intent.putExtra("url", url)
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            },
+            {
+                val intent = Intent(urlIntent)
+                intent.putExtra("url", url)
+                LocalBroadcastManager.getInstance(context)
+                    .sendBroadcast(intent)  // Send an empty url in case the request errors out
+            }
+        )
+
+        queue.add(request)
     }
 }
