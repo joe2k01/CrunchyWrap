@@ -74,8 +74,10 @@ class ApiCalls(val context: Context) {
                         inputLine = it.readLine()
                     }
                     it.close()
-                    val dataObject = JSONObject(response.toString()).get("data")
-                    sessionId = JSONObject(dataObject.toString()).get("session_id").toString()
+                    if (response.toString().contains("session_id")) {
+                        val dataObject = JSONObject(response.toString()).get("data")
+                        sessionId = JSONObject(dataObject.toString()).get("session_id").toString()
+                    }
                 }
             }
 

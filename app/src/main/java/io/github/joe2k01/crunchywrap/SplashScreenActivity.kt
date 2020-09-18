@@ -2,7 +2,10 @@ package io.github.joe2k01.crunchywrap
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
@@ -18,11 +21,22 @@ class SplashScreenActivity : AppCompatActivity() {
             sharedPref.edit().putString("uuid", UUID.randomUUID().toString()).apply()
         }
 
-        ApiCalls(this).authenticate()
-        ApiCalls(this).getLocales()
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
 
-        val main = Intent(this, MainActivity::class.java)
-        startActivity(main)
-        finish()
+        if (isConnected) {
+            ApiCalls(this).authenticate()
+
+            if (!sharedPref.getString("session_id", "").equals("")) {
+                ApiCalls(this).getLocales()
+
+                val main = Intent(this, MainActivity::class.java)
+                startActivity(main)
+                finish()
+            } else
+                Toast.makeText(this, R.string.went_wrong, Toast.LENGTH_LONG).show()
+        } else
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_LONG).show()
     }
 }
